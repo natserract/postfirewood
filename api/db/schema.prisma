@@ -1,18 +1,65 @@
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+// A Prisma schema can have one or more generators
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = "native"
 }
 
-// Define your own datamodels here and run `yarn redwood prisma migrate dev`
-// to create migrations for them and apply to your dev DB.
-// TODO: Please remove the following example:
-model UserExample {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+model User {
+  id            String   @id @unique @default(uuid())
+  name          String
+  email         String   @unique
+  emailVerified Boolean? @default(false)
+  gender        String?
+  phoneNumber   String
+
+  // @map: aliasing column name in database, in code: createdAt, db: createdAt
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // From: https://redwoodjs.com/docs/authentication#setup
+  // I'm using dbAuth
+  hashedPassword      String    @default("")
+  salt                String?   @default("")
+  resetToken          String?
+  resetTokenExpiresAt DateTime?
+
+  roles Role[] @relation("UserRoles")
+  posts Post[] @relation("Posts")
+
+
+  // @@map: aliasing table name in database, in code: User, db: user
+  @@map("user")
+}
+
+model Role {
+  id        String   @id @unique @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  user      User     @relation("UserRoles", fields: [userId], references: [id])
+  userId    String
+
+  @@map("role")
+}
+
+model Post {
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+  title     String
+  slug      String
+  body      String
+  image     String?
+
+  // This is one-to-one relations
+  // See more https://www.prisma.io/docs/concepts/components/prisma-schema/relations/one-to-one-relations
+  user   User   @relation("Posts", fields: [userId], references: [id])
+  userId String
+
+  @@unique([userId, slug])
+  @@map("post")
 }
