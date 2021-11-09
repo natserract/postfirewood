@@ -3,7 +3,7 @@
 # References:
 Docs [https://redwoodjs.com/docs](https://redwoodjs.com/docs)
 
-## Issues
+## Issues has been solved
 - node version, darwin is not compatible, so ignore the engine use `yarn install --ignore-engines"
 - [https://community.redwoodjs.com/t/error-unknown-type-json-did-you-mean-json/817](https://community.redwoodjs.com/t/error-unknown-type-json-did-you-mean-json/817)
 

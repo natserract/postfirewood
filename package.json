@@ -7,6 +7,12 @@
       "packages/*"
     ]
   },
+  "scripts": {
+    "dev": "rw dev",
+    "migrate": "rw prisma migrate dev",
+    "types": "rw g types",
+    "all": "yarn rw g sdl post --crud --ts -f && yarn rw g sdl roles --ts -f && yarn rw g sdl user --crud --ts -f"
+  },
   "devDependencies": {
     "@redwoodjs/core": "0.38.0"
   },
