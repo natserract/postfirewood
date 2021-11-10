@@ -28,3 +28,4 @@ Your browser should open automatically to `http://localhost:8910` to see the web
 
 ## Features
 - Authentication using firebase
+- Token encryption for authentication

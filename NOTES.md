@@ -6,6 +6,7 @@ Docs [https://redwoodjs.com/docs](https://redwoodjs.com/docs)
 ## Issues has been solved
 - node version, darwin is not compatible, so ignore the engine use `yarn install --ignore-engines"
 - [https://community.redwoodjs.com/t/error-unknown-type-json-did-you-mean-json/817](https://community.redwoodjs.com/t/error-unknown-type-json-did-you-mean-json/817)
+- window.addEventListener('storage', can't listened)
 
 ## Learn
 ### Day 1:
@@ -47,7 +48,31 @@ Docs [https://redwoodjs.com/docs](https://redwoodjs.com/docs)
   - Validation: https://redwoodjs.com/docs/services
 
 ## Day 2
-- [ ] Authentication
+- [X] Authentication
+    - Add authentication API action
+    - Integrate authorization with context
+    - Persist data in localStorage and sessionStorage
+- [ ] Manage User
+  - Docs: https://firebase.google.com/docs/auth/web/manage-users
+  - Create Reusable components for graphql query
+  - Private route https://redwoodjs.com/docs/router#sets-of-routes
+  - Setting roles https://console.firebase.google.com/u/0/project/redwoodauth/settings/iam
+  - Create signUp action
+    - After signup user secara otomatis langsung signin
+    - Add extra fields? from this article https://stackoverflow.com/questions/58547671/firebase-user-profile-add-custom-fields, using firebase DB (firestore), script:
+      ```js
+        this.auth.createUserWithEmailAndPassword(email, password)
+          .then(registeredUser => {
+            this.firestore.collection("usersCollection")
+            .add({
+              uid: registeredUser.user.uid,
+              field: 'Info you want to get here',
+              anotherField: 'Another Info...',
+              ....
+            })
+        }
+      ```
+    - [ ] Forgot password
 
 ## Questions
 - Apa Input types dan mutation ini perlu di tambahkan lagi? dan kalaupun secara otomatis di trigger darimana?

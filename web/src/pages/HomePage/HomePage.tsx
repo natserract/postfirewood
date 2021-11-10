@@ -1,12 +1,19 @@
-// import { Link, routes } from '@redwoodjs/router'
+import React from 'react'
 import { MetaTags } from '@redwoodjs/web'
-import { useData } from 'src/store/configureStore'
+import { useCached, useData } from 'src/store/configureStore'
 import { loginUser, logout } from 'src/api/Authorizations'
+import Query from 'src/components/Query/Query'
+// import { UsersQuery } from 'types/graphql'
+import UsersQuery from './query'
+import { createUser } from 'src/api/ManageUser'
+import { setItemNext } from 'src/utils/storage'
 
 const HomePage = () => {
-  const [{ auth }] = useData()
+  const [data] = useData()
+  const [cached] = useCached()
 
   const handleSignIn = async () => {
+    // TODO: CREATE FORM FOR SIGNIN
     const data = {
       email: 'alfins132@gmail.com',
       password: 'Alfin9090',
@@ -14,7 +21,10 @@ const HomePage = () => {
 
     try {
       const responseData = await loginUser(data.email, data.password)
-      console.log('responseData signIn', responseData)
+      const token = await responseData.user.getIdToken()
+      setItemNext('token', token, cached, true).subscribe((p) => {
+        console.log('Ho', p)
+      })
     } catch (error) {
       console.error('error', error.code)
     }
@@ -24,6 +34,20 @@ const HomePage = () => {
     try {
       const responseData = await logout()
       console.log('responseData Logout', responseData)
+    } catch (error) {
+      //
+    }
+  }
+
+  const handleSignUp = async () => {
+    const data = {
+      email: 'benjaminstwo@gmail.com',
+      password: 'Alfin9090',
+    }
+
+    try {
+      const responseData = await createUser(data.email, data.password)
+      console.log('responseData createUser', responseData)
     } catch (error) {
       //
     }
@@ -41,12 +65,21 @@ You can look at this documentation for best practices : https://developers.googl
       {/* <p>{JSON.stringify(userMetadata.accessToken)}</p> */}
       <button
         className="link-button"
-        onClick={auth.authenticated ? handleSignOut : handleSignIn}
+        onClick={data.auth.authenticated ? handleSignOut : handleSignIn}
       >
-        {auth.authenticated ? 'Log Out' : 'Log In'}
+        {data.auth.authenticated ? 'Log Out' : 'Log In'}
       </button>
 
-      {JSON.stringify(auth)}
+      {JSON.stringify(data)}
+
+      <br />
+      <button onClick={handleSignUp}>SignUp</button>
+
+      {/* <Query query={UsersQuery}>
+        {({ data }) => {
+          return <div>{JSON.stringify(data)}</div>
+        }}
+      </Query> */}
     </>
   )
 }

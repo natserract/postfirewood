@@ -1,12 +1,13 @@
 // If you want custom request
 // Using auth request @see https://firebase.google.com/docs/database/rest/auth
 import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth'
+import { setItem } from 'src/utils/storage'
 import { removeToken } from 'src/utils/token'
 
 export const loginUser = async (
   username: string,
   password: string,
-  rememberMe?: boolean
+  _rememberMe?: boolean
 ) => {
   const auth = getAuth()
 
@@ -19,14 +20,20 @@ export const loginUser = async (
         // getIdToken() return a JSON Web Token (JWT)
         const token = await response.user.getIdToken()
 
-        if (rememberMe) {
-          //localStorage = ersisted across tabs and new windows
-          localStorage.setItem('token', token)
-        } else {
-          // store JWT Token to browser session storage
-          // sessionStorage = persisted only in current tab
-          sessionStorage.setItem('token', token)
-        }
+        // | If you want use session storage
+        // ```
+        //  if (rememberMe) {
+        //    setItem('token', token, true)
+        //  } else {
+        //    // store JWT Token to browser session storage
+        //    // sessionStorage = persisted only in current tab
+        //    sessionStorage.setItem('token', token)
+        //  }
+        //  ```
+        //
+        //  localStorage = persisted across tabs and new windows
+        //  setLocalstorage item with encryption
+        setItem('token', token, true)
       }
 
       getToken()

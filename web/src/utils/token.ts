@@ -1,4 +1,6 @@
+import { removeItem } from './storage'
+
 export const removeToken = () => {
-  localStorage.removeItem('token')
+  removeItem('token')
   sessionStorage.removeItem('token')
 }
