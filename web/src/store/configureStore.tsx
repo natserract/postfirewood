@@ -25,6 +25,7 @@ const DataProvider = ({ children }) => {
       authenticated: false,
       token: '',
     },
+    user: {},
   })
 
   const resetValue = () => {
@@ -33,6 +34,7 @@ const DataProvider = ({ children }) => {
         authenticated: false,
         token: '',
       },
+      user: {},
     })
   }
 
@@ -45,6 +47,11 @@ const DataProvider = ({ children }) => {
           auth: {
             authenticated: true,
             token,
+          },
+          user: {
+            id: user.uid,
+            name: user.displayName,
+            email: user.email,
           },
         })
       } else {

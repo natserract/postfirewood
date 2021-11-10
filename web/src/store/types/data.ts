@@ -1,8 +1,7 @@
-export type AuthState = {
-  authenticated: boolean
-  token: string
-}
+import { AuthState } from './auth'
+import { UserState } from './user'
 
 export type DataState = {
   auth: AuthState
+  user: UserState | Record<string, never>
 }
