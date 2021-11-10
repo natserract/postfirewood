@@ -35,6 +35,7 @@ export const loginUser = async (
     }
   } catch (error) {
     return Promise.reject({
+      // Check AuthErrorCodes @see https://firebase.google.com/docs/reference/js/auth#autherrorcodes
       code: error.code,
       what: error.message,
     })
