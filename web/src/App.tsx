@@ -7,6 +7,7 @@ import { RedwoodApolloProvider } from '@redwoodjs/web/apollo'
 
 import FatalErrorPage from 'src/pages/FatalErrorPage'
 import Routes from 'src/Routes'
+import { AllContextProvider } from './store/configureStore'
 
 import './index.css'
 
@@ -32,7 +33,7 @@ const firebaseApp = ((config) => {
 
 export const firebaseClient = {
   firebaseAuth,
-  firebaseApp, // optional
+  firebaseApp,
 }
 
 const App = () => (
@@ -40,7 +41,9 @@ const App = () => (
     <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
       <AuthProvider client={firebaseClient} type="firebase">
         <RedwoodApolloProvider>
-          <Routes />
+          <AllContextProvider>
+            <Routes />
+          </AllContextProvider>
         </RedwoodApolloProvider>
       </AuthProvider>
     </RedwoodProvider>
