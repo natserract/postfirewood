@@ -1,3 +1,5 @@
+// If you want custom request
+// Using auth request @see https://firebase.google.com/docs/database/rest/auth
 import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth'
 import { removeToken } from 'src/utils/token'
 
