@@ -39,12 +39,15 @@ Docs [https://redwoodjs.com/docs](https://redwoodjs.com/docs)
     - After create modelling, run `yarn rw g sdl {model_name}` for generate file `graphql/.sdl.ts` and `services/.`
   - `yarn rw g sdl account --crud` untuk mutation otomatis dibuat, kalo ada arg --crud. This is Cool!
 
-- [ ] Authentication
+- [X] Authentication
   - References: https://github.com/redwoodjs/playground-auth/tree/main/api/src/functions
   - Setup auth using firebase `yarn rw setup auth firebase`
   - Add in App.tsx AuthProvide `client={firebaseClient} type="firebase"`
   - Settings firebaseConfig
   - Validation: https://redwoodjs.com/docs/services
+
+## Day 2
+- [ ] Authentication
 
 ## Questions
 - Apa Input types dan mutation ini perlu di tambahkan lagi? dan kalaupun secara otomatis di trigger darimana?
