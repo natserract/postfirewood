@@ -9,6 +9,17 @@ export const USERS_QUERY = gql`
   }
 `
 
+export const POSTS_QUERY = gql`
+  query PostsQuery {
+    posts {
+      id
+      title
+      body
+      createdAt
+    }
+  }
+`
+
 export const CREATEPOST_MUTATION = gql`
   mutation CreatePostMutation($input: CreatePostInput!) {
     createPost(input: $input) {

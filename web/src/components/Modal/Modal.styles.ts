@@ -17,6 +17,7 @@ const styles = (theme: Theme) =>
     },
     dialogContent: {
       paddingBottom: 30,
+      minHeight: 300,
     },
     closeButton: {
       position: 'absolute',

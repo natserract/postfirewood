@@ -13,16 +13,17 @@ import {
 } from '@redwoodjs/forms'
 import Button from '@material-ui/core/Button'
 import { Container } from '@material-ui/core'
-import { useMutation } from '@redwoodjs/web'
-import { CREATEPOST_MUTATION } from './DashboardPage.graphql'
+import { useMutation, useQuery } from '@redwoodjs/web'
+import { CREATEPOST_MUTATION, POSTS_QUERY } from './DashboardPage.graphql'
 import { toast } from '@redwoodjs/web/toast'
 import { stringToSlug } from 'src/utils/slug'
 
 const DashboardPage = () => {
-  const [{ user }] = useData()
-  const [createPostFunc] = useMutation(CREATEPOST_MUTATION)
-
+  const [{ user, auth }] = useData()
   const formMethods = useForm()
+
+  const { data: postsData, refetch: refetchPostsData } = useQuery(POSTS_QUERY)
+  const [createPostFunc] = useMutation(CREATEPOST_MUTATION)
 
   const [openActivityDialog, setOpenActivityDialog] = useState(false)
 
@@ -30,28 +31,33 @@ const DashboardPage = () => {
     if (data) {
       handleCreatePost(data)
         .then(() => {
-          console.log('Success')
+          refetchPostsData()
+          setOpenActivityDialog(false)
         })
         .catch((error) => {
           console.error('error', error.code)
+          toast.error(`Error create post ${error.message}, ${error.code}`)
         })
     }
   }
 
   const handleCreatePost = async ({ title, content }) => {
     try {
-      const { data } = await createPostFunc({
+      const responseCreatePost = await createPostFunc({
         variables: {
           input: {
             title,
             slug: stringToSlug(title),
             body: content,
+
+            // We need edit in the backend {services/posts}
+            // Example: db.post.findUnique({ where: { id: root.userId } }).user(),
             userId: user.id,
           },
         },
       })
 
-      console.log('createUser check', data)
+      return responseCreatePost
     } catch (error) {
       console.error(error)
       toast.error(`Error handleCreatePost: ${error.what}, Code: ${error.code}`)
@@ -118,7 +124,11 @@ const DashboardPage = () => {
       </Navigation>
 
       <Container disableGutters={true}>
-        <p>Content</p>
+        {auth.loading ? (
+          'Loading...'
+        ) : (
+          <div>JSON {JSON.stringify(postsData)}</div>
+        )}
       </Container>
     </>
   )

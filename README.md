@@ -35,3 +35,4 @@ The goal is to have the following:
 - Rest API Axios support
 - Save data on PostgreSQL Database
 - HTML5 History/State APIs
+- Material UI Components Integration

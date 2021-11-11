@@ -6,6 +6,8 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
 import IconButton from '@material-ui/core/IconButton'
 import CloseIcon from '@material-ui/icons/Close'
+import CircularProgress from '@material-ui/core/CircularProgress'
+import { useData } from 'src/store/configureStore'
 
 type Props = {
   title: string
@@ -31,6 +33,8 @@ const Modal: React.FC<Props> = (props) => {
 
   const classes = useStyles()
   const isDisabled = closeReason && closeReason !== 'disabled'
+
+  const [{ auth }] = useData()
 
   const handleClose = (_, reason: typeof closeReason) => {
     if (reason !== 'disabled') {
@@ -63,7 +67,7 @@ const Modal: React.FC<Props> = (props) => {
       </DialogTitle>
 
       <DialogContent dividers className={classes.dialogContent}>
-        {children}
+        {auth.loading ? <CircularProgress /> : children}
       </DialogContent>
 
       {/* <DialogActions>
