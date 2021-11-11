@@ -8,11 +8,7 @@ export const standard = defineScenario<Prisma.PostCreateArgs>({
         slug: 'String',
         body: 'String',
         user: {
-          create: {
-            name: 'String',
-            email: 'String7939344',
-            phoneNumber: 'String',
-          },
+          create: { uid: 'String8427668', name: 'String', email: 'String' },
         },
       },
     },
@@ -22,11 +18,7 @@ export const standard = defineScenario<Prisma.PostCreateArgs>({
         slug: 'String',
         body: 'String',
         user: {
-          create: {
-            name: 'String',
-            email: 'String8712647',
-            phoneNumber: 'String',
-          },
+          create: { uid: 'String3825714', name: 'String', email: 'String' },
         },
       },
     },

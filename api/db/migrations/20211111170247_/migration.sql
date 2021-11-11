@@ -1,11 +1,12 @@
 -- CreateTable
 CREATE TABLE "user" (
     "id" TEXT NOT NULL,
+    "uid" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "emailVerified" BOOLEAN DEFAULT false,
     "gender" TEXT,
-    "phoneNumber" TEXT NOT NULL,
+    "phoneNumber" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "hashedPassword" TEXT NOT NULL DEFAULT E'',
     "salt" TEXT DEFAULT E'',
@@ -44,19 +45,22 @@ CREATE TABLE "post" (
 CREATE UNIQUE INDEX "user_id_key" ON "user"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
+CREATE UNIQUE INDEX "user_uid_key" ON "user"("uid");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_email_uid_key" ON "user"("email", "uid");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "role_id_key" ON "role"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "post_id_key" ON "post"("id");
+CREATE UNIQUE INDEX "post_userId_key" ON "post"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "post_userId_slug_key" ON "post"("userId", "slug");
 
 -- AddForeignKey
-ALTER TABLE "role" ADD CONSTRAINT "role_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "role" ADD CONSTRAINT "role_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("uid") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "post" ADD CONSTRAINT "post_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "post" ADD CONSTRAINT "post_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("uid") ON DELETE RESTRICT ON UPDATE CASCADE;

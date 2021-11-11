@@ -42,5 +42,5 @@ export const deletePost = ({ id }: Prisma.PostWhereUniqueInput) => {
 
 export const Post = {
   user: (_obj, { root }: ResolverArgs<ReturnType<typeof post>>) =>
-    db.post.findUnique({ where: { id: root.id } }).user(),
+    db.post.findUnique({ where: { id: root.userId } }).user(),
 }
