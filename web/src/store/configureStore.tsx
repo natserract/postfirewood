@@ -1,3 +1,4 @@
+import { useAuth } from '@redwoodjs/auth'
 import { getAuth } from 'firebase/auth'
 import {
   createContext,
@@ -23,17 +24,20 @@ export const useData = () => useContext(DataCtx) as [DataState, Function]
 
 const DataProvider = ({ children }) => {
   const auth = getAuth()
+  const _authConfig = useAuth()
   const [cached, _, destroy$] = useCached()
 
   // We need move different section, avoid infinite re-render
   const [tokenInitialState, setTokenInitialState] = useState(null)
   const [isAuthState, setIsAuthState] = useState(false)
   const [userInitialState, setUserInitialState] = useState({})
+  const [loadingState, setLoadingState] = useState(false)
 
   const [state, setState] = useState<DataState>({
     auth: {
-      authenticated: isAuthState,
-      token: tokenInitialState,
+      authenticated: false,
+      token: null,
+      loading: false,
     },
     user: userInitialState,
   })
@@ -70,15 +74,11 @@ const DataProvider = ({ children }) => {
       setUserInitialState({})
     }
 
-    // Set values, after user authenticated, from redwood {currentUser}
-    // We need triggerring {authConfig} because firebase & redwood state is async
-    // const { isAuthenticated } = authConfig
-    // console.log('authConfig', authConfig.logIn())
-
     // Handle user state if logged in
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         setUserState(user)
+        setLoadingState(false)
       } else {
         const signOut = async () => {
           try {
@@ -102,10 +102,11 @@ const DataProvider = ({ children }) => {
       auth: {
         authenticated: isAuthState,
         token: tokenInitialState,
+        loading: loadingState,
       },
       user: userInitialState,
     })
-  }, [tokenInitialState, isAuthState, userInitialState])
+  }, [tokenInitialState, isAuthState, userInitialState, loadingState])
 
   const setValue = useCallback((data: DataState) => {
     if (!data) throw new TypeError()

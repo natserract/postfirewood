@@ -1,4 +1,4 @@
-import { MetaTags } from '@redwoodjs/web'
+import { MetaTags, useMutation } from '@redwoodjs/web'
 import { useState } from 'react'
 import Modal from 'src/components/Modal/Modal'
 import {
@@ -15,11 +15,15 @@ import { createUser } from 'src/api/ManageUser'
 import { useCached } from 'src/store/configureStore'
 import { useAuth } from '@redwoodjs/auth'
 import { browserHistory } from 'src/utils/history'
+import { CREATEUSER_MUTATION } from './Register.graphql'
+import { encryptData } from 'src/utils/encrypt'
 
 const RegisterPage = () => {
   const authConfig = useAuth()
   const [cached] = useCached()
   const formMethods = useForm()
+
+  const [createUserFunc] = useMutation(CREATEUSER_MUTATION)
 
   const [openDialog, setOpenDialog] = useState(true)
 
@@ -35,16 +39,27 @@ const RegisterPage = () => {
     }
   }
 
-  const handleSignUp = async (data) => {
+  const handleSignUp = async (input) => {
     try {
-      const response = await createUser(
-        data.email,
-        data.password,
-        cached,
-        authConfig
-      )
+      const { email, password } = input
+      const hashedPassword = encryptData(password)
+
+      const response = await createUser(email, password, cached, authConfig)
 
       if (response) {
+        const { data } = await createUserFunc({
+          variables: {
+            input: {
+              uid: response.user.uid,
+              name: email,
+              email,
+              hashedPassword,
+            },
+          },
+        })
+
+        console.log('response', response)
+        console.log('data register user', data)
         return response
       }
     } catch (error) {

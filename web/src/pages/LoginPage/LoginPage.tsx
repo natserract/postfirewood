@@ -10,7 +10,6 @@ import {
 import Button from '@material-ui/core/Button'
 import { useCached } from 'src/store/configureStore'
 import { MetaTags } from '@redwoodjs/web'
-import { browserHistory } from 'src/utils/history'
 import { useEffect, useState } from 'react'
 import Modal from 'src/components/Modal/Modal'
 import { loginUser } from 'src/api/Authorizations'
@@ -22,13 +21,16 @@ const LoginPage = () => {
   const [cached] = useCached()
   const formMethods = useForm()
 
+  const [loadingDialog, setLoadingDialog] = useState(false)
   const [openDialog, setOpenDialog] = useState(true)
 
   const handleSubmit = (data) => {
     if (data) {
+      setLoadingDialog(true)
+
       handleSignIn(data)
         .then(() => {
-          browserHistory.push('/dashboard')
+          setLoadingDialog(false)
         })
         .catch((error) => {
           console.error('error', error.code)
@@ -55,7 +57,6 @@ const LoginPage = () => {
 
   useEffect(() => {
     return () => {
-      setOpenDialog(false)
       formMethods.reset()
     }
   }, [formMethods])
@@ -121,7 +122,7 @@ const LoginPage = () => {
             variant="contained"
             style={{ textTransform: 'capitalize' }}
           >
-            Sign In
+            {loadingDialog ? 'Loading...' : 'Sign In'}
           </Button>
 
           <div style={{ marginTop: 25, fontSize: 13 }}>
