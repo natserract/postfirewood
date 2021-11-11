@@ -26,9 +26,12 @@ yarn redwood dev
 
 Your browser should open automatically to `http://localhost:8910` to see the web app. Lambda functions run on `http://localhost:8911` and are also proxied to `http://localhost:8910/.redwood/functions/*`.
 
-## Features
+## Addition Features
 The goal is to have the following:
-- Authentication using firebase
+- Authentication and Sign Up using firebase
 - Token encryption for authentication
 - Observable token
 - Custom Private Routes
+- Rest API Axios support
+- Save data on PostgreSQL Database
+- HTML5 History/State APIs
