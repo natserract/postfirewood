@@ -6,10 +6,12 @@ import { FatalErrorBoundary, RedwoodProvider } from '@redwoodjs/web'
 import { RedwoodApolloProvider } from '@redwoodjs/web/apollo'
 
 import FatalErrorPage from 'src/pages/FatalErrorPage'
-import Routes from 'src/Routes'
 import { AllContextProvider } from './store/configureStore'
+import { Router } from 'react-router-dom'
+import CustomRoutes from './CustomRoutes'
 
 import './index.css'
+import { browserHistory } from './utils/history'
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -42,7 +44,9 @@ const App = () => (
       <AuthProvider client={firebaseClient} type="firebase">
         <RedwoodApolloProvider>
           <AllContextProvider>
-            <Routes />
+            <Router history={browserHistory}>
+              <CustomRoutes />
+            </Router>
           </AllContextProvider>
         </RedwoodApolloProvider>
       </AuthProvider>

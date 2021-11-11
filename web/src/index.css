@@ -1,0 +1,61 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  color: #000;
+}
+
+a {
+  color: #303f9f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+p {
+  color: "#fff",
+}
+
+.MuiFormControl-root {
+  margin: 15px 0;
+}
+
+.MuiButtonBase-roo {
+  text-transform: capitalize;
+}
+
+.form-group {
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin: 10px 0;
+  text-transform: uppercase;
+  color: #000;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  height: 42px;
+  border: solid 1px #e5e5e5;
+  border-radius: 7px;
+  padding: 4px 8px;
+}
+
+.form-group .error-message {
+  font-size: 13px;
+  text-transform: capitalize;
+  margin: 5px 0 21px;
+  display: block;
+}
+
+
+form button[type="submit"] {
+  margin-top: 25px;
+}

@@ -18,10 +18,16 @@
     "types": "rw g types"
   },
   "dependencies": {
+    "@material-ui/core": "^4.12.3",
+    "@material-ui/icons": "^4.11.2",
     "@redwoodjs/auth": "^0.38.0",
     "@redwoodjs/forms": "0.38.0",
     "@redwoodjs/router": "0.38.0",
     "@redwoodjs/web": "0.38.0",
+    "@types/react-router-dom": "^5.1.6",
+    "react-router-dom": "^5.2.0",
+    "@types/history": "^4.7.8",
+    "history": "^4.7.8",
     "axios": "^0.24.0",
     "crypto-js": "^4.1.1",
     "firebase": "^9.4.0",

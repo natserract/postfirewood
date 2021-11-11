@@ -4,6 +4,7 @@ const QUERY = gql`
       id
       name
       email
+      emailVerified
     }
   }
 `

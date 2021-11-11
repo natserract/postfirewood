@@ -1,11 +1,11 @@
 import { render } from '@redwoodjs/testing/web'
 
-import HomePage from './HomePage'
+import Modal from './Modal'
 
-describe('HomePage', () => {
+describe('Modal', () => {
   it('renders successfully', () => {
     expect(() => {
-      render(<HomePage />)
+      render(<Modal />)
     }).not.toThrow()
   })
 })
