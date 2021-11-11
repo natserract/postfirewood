@@ -12,15 +12,6 @@ const DashboardPage = () => {
   const [data] = useData()
   const [cached] = useCached()
 
-  const handleSignOut = async () => {
-    try {
-      const responseData = await logout()
-      console.log('responseData Logout', responseData)
-    } catch (error) {
-      //
-    }
-  }
-
   const handleSignUp = async () => {
     const data = {
       email: 'benjaminstwo@gmail.com',
@@ -44,9 +35,6 @@ const DashboardPage = () => {
 You can look at this documentation for best practices : https://developers.google.com/search/docs/advanced/appearance/good-titles-snippets */
       />
       <h1>HomePage</h1>
-      <button className="link-button" onClick={handleSignOut}>
-        LogOut
-      </button>
       {/* <p>{JSON.stringify(userMetadata.accessToken)}</p> */}
       {/* <button
         className="link-button"
@@ -65,6 +53,11 @@ You can look at this documentation for best practices : https://developers.googl
           return <div>{JSON.stringify(data)}</div>
         }}
       </Query> */}
+      <Query query={UsersQuery}>
+        {({ data }) => {
+          return <div>{JSON.stringify(data)}</div>
+        }}
+      </Query>
     </>
   )
 }

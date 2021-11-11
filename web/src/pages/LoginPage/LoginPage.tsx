@@ -12,15 +12,15 @@ import {
 
 import { useCached } from 'src/store/configureStore'
 import { MetaTags } from '@redwoodjs/web'
-import { Link, navigate, routes } from '@redwoodjs/router'
-import { useState } from 'react'
+import { browserHistory } from 'src/utils/history'
+import { useEffect, useState } from 'react'
 import Modal from 'src/components/Modal/Modal'
 import { loginUser } from 'src/api/Authorizations'
-import { toast } from '@redwoodjs/web/toast'
+import { Link } from 'react-router-dom'
 import { useAuth } from '@redwoodjs/auth'
 
 const LoginPage = () => {
-  const auth = useAuth()
+  const authConfig = useAuth()
   const formMethods = useForm()
   const [cached] = useCached()
 
@@ -28,33 +28,39 @@ const LoginPage = () => {
 
   const handleSubmit = (data) => {
     if (data) {
-      return handleSignIn(data)
+      handleSignIn(data)
+        .then(() => {
+          browserHistory.push('/dashboard')
+        })
+        .catch((error) => {
+          console.error('error', error.code)
+        })
     }
   }
 
   const handleSignIn = async (data) => {
     try {
-      const response = await loginUser(data.email, data.password, cached)
+      const response = await loginUser(
+        data.email,
+        data.password,
+        cached,
+        authConfig
+      )
 
       if (response) {
-        const user = response.user
-
-        if (user) {
-          setOpenDialog(false)
-          console.log('auth', auth)
-
-          navigate(routes.dashboard(), {
-            replace: true,
-          })
-        }
+        return response
       }
     } catch (error) {
       console.error('error', error.code)
-      toast.error(`Error: ${error.what}, Code: ${error.code}`)
-    } finally {
-      formMethods.reset()
     }
   }
+
+  useEffect(() => {
+    return () => {
+      setOpenDialog(false)
+      formMethods.reset()
+    }
+  }, [formMethods])
 
   return (
     <>

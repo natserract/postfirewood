@@ -1,3 +1,4 @@
+import { useAuth } from '@redwoodjs/auth'
 import { getAuth } from 'firebase/auth'
 import {
   createContext,
@@ -10,7 +11,8 @@ import {
 } from 'react'
 import { Subject, takeUntil } from 'rxjs'
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject'
-import { listen$ } from 'src/utils/storage'
+import { logout } from 'src/api/Authorizations'
+import { getItem, listen$ } from 'src/utils/storage'
 import { DataState } from './types/data'
 
 type Context<T> = T | (T | ((a: T) => void))[]
@@ -22,56 +24,101 @@ export const useData = () => useContext(DataCtx) as [DataState, Function]
 
 const DataProvider = ({ children }) => {
   const auth = getAuth()
+  const authConfig = useAuth()
   const [cached, _, destroy$] = useCached()
+
+  // We need move different section, avoid infinite re-render
+  const [tokenInitialState, setTokenInitialState] = useState(null)
+  const [isAuthState, setIsAuthState] = useState(false)
+  const [userInitialState, setUserInitialState] = useState({})
 
   const [state, setState] = useState<DataState>({
     auth: {
-      authenticated: false,
-      token: '',
+      authenticated: isAuthState,
+      token: tokenInitialState,
     },
-    user: {},
+    user: userInitialState,
   })
 
-  const resetValues = useCallback(() => {
-    setState({
-      auth: {
-        authenticated: false,
-        token: '',
-      },
-      user: {},
-    })
-  }, [])
+  // Set authenticated true if token has been added
+  // This is used for routing
+  useEffect(() => {
+    listen$('token', cached, true)
+      .pipe(takeUntil(destroy$))
+      .subscribe((newToken) => {
+        setTokenInitialState(newToken)
+
+        // Set isAuthenticated = true, if token has been set
+        // if else (token empty), isAuthenticated = false
+        if (newToken) {
+          setIsAuthState(true)
+        }
+      })
+  }, [cached, destroy$])
 
   // Adds an observer for changes to the user's sign-in state.
   const authStateChanged = useCallback(() => {
-    const changeState = (token: string, user) => {
-      setState({
-        auth: {
-          authenticated: true,
-          token,
-        },
-        user: {
-          id: user.uid,
-          name: user.displayName,
-          email: user.email,
-        },
+    const setUserState = (user) => {
+      setUserInitialState({
+        id: user.uid,
+        name: user.displayName,
+        email: user.email,
       })
     }
 
+    const resetUserState = () => {
+      setIsAuthState(false)
+      setUserInitialState({})
+    }
+
+    // Set values, after user authenticated, from redwood {currentUser}
+    // We need triggerring {authConfig} because firebase & redwood state is async
+    // const { isAuthenticated } = authConfig
+    // console.log('authConfig', authConfig.logIn())
+
+    // Handle user state if logged in
     auth.onAuthStateChanged(async (user) => {
-      listen$('token', cached, true)
-        .pipe(takeUntil(destroy$))
-        .subscribe((token: string) => {
-          if (user) {
-            changeState(token, user)
-          } else {
-            resetValues()
+      if (user) {
+        setUserState(user)
+      } else {
+        const signOut = async () => {
+          try {
+            return await logout()
+          } catch (error) {
+            console.error('error', error.code)
           }
-        })
+        }
+
+        resetUserState()
+        signOut()
+      }
     })
-  }, [auth, cached, destroy$, resetValues])
+  }, [auth])
 
   useEffect(authStateChanged, [authStateChanged])
+
+  // Main actions
+  useEffect(() => {
+    setState({
+      auth: {
+        authenticated: isAuthState,
+        token: tokenInitialState,
+      },
+      user: userInitialState,
+    })
+  }, [tokenInitialState, isAuthState, userInitialState])
+
+  // useEffect(() => {
+  //   authConfig.logIn({
+  //     email: state.user.email,
+  //     password: state.user.p
+  //   })
+
+  // }, [state, authConfig])
+
+  // useEffect(() => {
+  //   console.log('authConfig', authConfig)
+  // }, [authConfig])
 
   const setValue = useCallback((data: DataState) => {
     if (!data) throw new TypeError()
