@@ -6,7 +6,7 @@ import Query from 'src/components/Query/Query'
 // import { UsersQuery } from 'types/graphql'
 import UsersQuery from './query'
 import { createUser } from 'src/api/ManageUser'
-import { setItemNext } from 'src/utils/storage'
+import { setItem$ } from 'src/utils/storage'
 
 const HomePage = () => {
   const [data] = useData()
@@ -20,11 +20,13 @@ const HomePage = () => {
     }
 
     try {
-      const responseData = await loginUser(data.email, data.password)
+      const responseData = await loginUser(data.email, data.password, cached)
       const token = await responseData.user.getIdToken()
-      setItemNext('token', token, cached, true).subscribe((p) => {
-        console.log('Ho', p)
-      })
+
+      console.log('TOKEN', token)
+      // setItem$('token', token, cached, true).subscribe((p) => {
+      //   console.log('Ho', p)
+      // })
     } catch (error) {
       console.error('error', error.code)
     }
@@ -46,7 +48,7 @@ const HomePage = () => {
     }
 
     try {
-      const responseData = await createUser(data.email, data.password)
+      const responseData = await createUser(data.email, data.password, cached)
       console.log('responseData createUser', responseData)
     } catch (error) {
       //

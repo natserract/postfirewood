@@ -3,8 +3,16 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from 'firebase/auth'
+import { of } from 'rxjs'
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject'
+import { setItem$, setItem } from 'src/utils/storage'
 
-export const createUser = async (username: string, password: string) => {
+export const createUser = async (
+  username: string,
+  password: string,
+  cached?: BehaviorSubject<unknown>,
+  asObservable = true
+) => {
   const auth = getAuth()
 
   try {
@@ -15,6 +23,18 @@ export const createUser = async (username: string, password: string) => {
     )
 
     if (response) {
+      const token = await response.user.getIdToken()
+
+      // After submit, user login directly,
+      // So we need to set token in localstorage
+      if (asObservable && cached) {
+        setItem$('token', token, cached, true).subscribe((data) => of(data))
+      }
+
+      if (!asObservable) {
+        setItem('token', token, true)
+      }
+
       // After success create new user, send email verification
       sendVerification()
 
