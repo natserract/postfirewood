@@ -1,12 +1,15 @@
 // If you want custom request
 // Using auth request @see https://firebase.google.com/docs/database/rest/auth
 import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth'
-import { setItem } from 'src/utils/storage'
+import { BehaviorSubject, of } from 'rxjs'
+import { setItem, setItem$ } from 'src/utils/storage'
 import { removeToken } from 'src/utils/token'
 
 export const loginUser = async (
   username: string,
   password: string,
+  cached?: BehaviorSubject<unknown>,
+  asObservable = true,
   _rememberMe?: boolean
 ) => {
   const auth = getAuth()
@@ -16,7 +19,7 @@ export const loginUser = async (
 
     if (response) {
       // Create Access Token
-      const getToken = async () => {
+      const generateToken = async () => {
         // getIdToken() return a JSON Web Token (JWT)
         const token = await response.user.getIdToken()
 
@@ -33,16 +36,23 @@ export const loginUser = async (
         //
         //  localStorage = persisted across tabs and new windows
         //  setLocalstorage item with encryption
-        setItem('token', token, true)
+        if (asObservable && cached) {
+          setItem$('token', token, cached, true).subscribe((data) => of(data))
+        }
+
+        if (!asObservable) {
+          setItem('token', token, true)
+        }
       }
 
-      getToken()
+      generateToken()
 
       return response
     }
   } catch (error) {
     return Promise.reject({
-      // Check AuthErrorCodes @see https://firebase.google.com/docs/reference/js/auth#autherrorcodes
+      // Check AuthErrorCodes,
+      // @see https://firebase.google.com/docs/reference/js/auth#autherrorcodes
       code: error.code,
       what: error.message,
     })

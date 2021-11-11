@@ -39,7 +39,7 @@ export const clear = () => {
   return localStorage.clear()
 }
 
-export const getItemNext = (key: string) => {
+export const get$ = (key: string) => {
   let item = localStorage.getItem(key)
 
   if (!item) {
@@ -49,19 +49,10 @@ export const getItemNext = (key: string) => {
   }
 
   return item
-  // try {
-  //   if (cache[key]) {
-  //     return cache[key]
-  //   } else {
-  //     return (cache[key] = new BehaviorSubject(
-  //       JSON.parse(localStorage.getItem(key))
-  //     ))
-  //   }
-  // } catch (err) {
-  //   throw new Error()
-  // }
 }
-export const setItemNext = <T>(
+
+// setItem$ is observable
+export const setItem$ = <T>(
   key: string,
   value: T,
   cache: BehaviorSubject<T>,
@@ -83,30 +74,18 @@ export const setItemNext = <T>(
     cache[key].next(serializeState)
     return cache[key]
   }
-  // try {
-  //   const serializeState = JSON.stringify(value)
-  //   localStorage.setItem(key, serializeState)
-
-  //   if (cache[key]) {
-  //     cache[key].next(value)
-  //     return cache[key]
-  //   }
-  // } catch (err) {
-  //   throw new Error(err)
-  // }
 }
 
-export const watch = <T>(
+// listen$ is observable
+// watch any change of localstorage
+// @use: listen$('token', cached, true).pipe(takeUntil(destroy$)).subscribe(
+export const listen$ = <T>(
   key: string,
   cache: BehaviorSubject<T>,
-  encrypted = false
+  _encrypted = false
 ): BehaviorSubject<T> => {
   if (!cache[key]) {
     const value = localStorage.getItem(key)
-
-    // if (encrypted) {
-    //   value = decryptData(value)
-    // }
 
     return (cache[key] = new BehaviorSubject(JSON.parse(JSON.stringify(value))))
   }
@@ -116,13 +95,8 @@ export const watch = <T>(
   if (!item) {
     item = undefined
   } else {
-    if (encrypted) {
-      item = decryptData(item)
-    } else {
-      item = JSON.parse(JSON.stringify(item))
-    }
+    item = JSON.parse(JSON.stringify(item))
   }
 
-  cache[key].next(item)
   return cache[key]
 }

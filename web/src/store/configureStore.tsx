@@ -7,11 +7,10 @@ import {
   createElement,
   useContext,
   useEffect,
-  useRef,
 } from 'react'
 import { Subject, takeUntil } from 'rxjs'
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject'
-import { getItem, getItemNext, setItemNext, watch } from 'src/utils/storage'
+import { listen$ } from 'src/utils/storage'
 import { DataState } from './types/data'
 
 type Context<T> = T | (T | ((a: T) => void))[]
@@ -23,11 +22,7 @@ export const useData = () => useContext(DataCtx) as [DataState, Function]
 
 const DataProvider = ({ children }) => {
   const auth = getAuth()
-  const [cached, , destroy$] = useCached()
-
-  // const handleChangeBehaviourSubject = React.useCallback(() => {
-  //   // behaviourSubject.next(e.target.value)
-  // }, [behaviourSubject])
+  const [cached, _, destroy$] = useCached()
 
   const [state, setState] = useState<DataState>({
     auth: {
@@ -37,7 +32,7 @@ const DataProvider = ({ children }) => {
     user: {},
   })
 
-  const resetValue = () => {
+  const resetValues = useCallback(() => {
     setState({
       auth: {
         authenticated: false,
@@ -45,77 +40,38 @@ const DataProvider = ({ children }) => {
       },
       user: {},
     })
-  }
+  }, [])
 
   // Adds an observer for changes to the user's sign-in state.
   const authStateChanged = useCallback(() => {
+    const changeState = (token: string, user) => {
+      setState({
+        auth: {
+          authenticated: true,
+          token,
+        },
+        user: {
+          id: user.uid,
+          name: user.displayName,
+          email: user.email,
+        },
+      })
+    }
+
     auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        // const token = await user.getIdToken()
-        // Ensure this user has been loggged in
-        watch('token', cached, true)
-          .pipe(takeUntil(destroy$))
-          .subscribe((token: string) => {
-            console.log('token$', token)
-            setState({
-              auth: {
-                authenticated: true,
-                token,
-              },
-              user: {
-                id: user.uid,
-                name: user.displayName,
-                email: user.email,
-              },
-            })
-          })
-      } else {
-        resetValue()
-      }
+      listen$('token', cached, true)
+        .pipe(takeUntil(destroy$))
+        .subscribe((token: string) => {
+          if (user) {
+            changeState(token, user)
+          } else {
+            resetValues()
+          }
+        })
     })
-  }, [auth, cached, destroy$])
+  }, [auth, cached, destroy$, resetValues])
 
   useEffect(authStateChanged, [authStateChanged])
-
-  // useEffect(() => {
-  //   auth.onAuthStateChanged(async () => {
-  //     const token = getItemNext('token', behaviourSubject)
-
-  //     token.subscribe((v) => {
-  //       console.log('token v', v)
-  //     })
-  //   })
-  // }, [auth, behaviourSubject])
-
-  // useEffect(() => {
-  //   console.log('behaviourSubject', behaviourSubject)
-  // }, [behaviourSubject])
-
-  // useEffect(() => {
-  //   // console.log('getNext', getItemNext('token2'))
-
-  //   watch('token', cached)
-  //     .pipe()
-  //     .subscribe((item) => {
-  //       // setCached({
-  //       //   token: item,
-  //       // })
-  //       console.log('token changed item', item)
-  //     })
-  //   // newValue.subscribe((t) => {
-  //   //   console.log("it's work?", t)
-  //   // })
-  //   // const token = getItemNext('token', cached)
-  //   // token.subscribe((t) => {
-  //   //   console.log('getToken', t)
-  //   // })
-  // }, [cached])
-
-  console.log('rendered times')
-
-  // useEffect(() => {
-  //   console.log('state token', state)
-  // }, [state])
 
   const setValue = useCallback((data: DataState) => {
     if (!data) throw new TypeError()
@@ -125,13 +81,20 @@ const DataProvider = ({ children }) => {
 
   const value = useMemo(() => [state, setValue], [state, setValue])
 
+  console.log('rendered times')
+
   return createElement(DataCtx.Provider, { value }, children)
 }
 
-const CachedCtx = createContext<Context<any>>(undefined)
+const CachedCtx = createContext<Context<unknown>>(undefined)
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export const useCached = () => useContext(CachedCtx) as [any, any, Function]
+export const useCached = () =>
+  useContext(CachedCtx) as [
+    BehaviorSubject<unknown>,
+    React.Dispatch<React.SetStateAction<BehaviorSubject<unknown>>>,
+    Subject<boolean>
+  ]
 
 export const CachedProvider = ({ children }) => {
   // Implement reactive programming
