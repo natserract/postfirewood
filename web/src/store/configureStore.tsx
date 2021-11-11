@@ -1,4 +1,3 @@
-import { useAuth } from '@redwoodjs/auth'
 import { getAuth } from 'firebase/auth'
 import {
   createContext,
@@ -12,7 +11,7 @@ import {
 import { Subject, takeUntil } from 'rxjs'
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject'
 import { logout } from 'src/api/Authorizations'
-import { getItem, listen$ } from 'src/utils/storage'
+import { listen$ } from 'src/utils/storage'
 import { DataState } from './types/data'
 
 type Context<T> = T | (T | ((a: T) => void))[]
@@ -24,7 +23,6 @@ export const useData = () => useContext(DataCtx) as [DataState, Function]
 
 const DataProvider = ({ children }) => {
   const auth = getAuth()
-  const authConfig = useAuth()
   const [cached, _, destroy$] = useCached()
 
   // We need move different section, avoid infinite re-render
@@ -63,6 +61,7 @@ const DataProvider = ({ children }) => {
         id: user.uid,
         name: user.displayName,
         email: user.email,
+        emailVerified: user.emailVerified,
       })
     }
 
@@ -107,18 +106,6 @@ const DataProvider = ({ children }) => {
       user: userInitialState,
     })
   }, [tokenInitialState, isAuthState, userInitialState])
-
-  // useEffect(() => {
-  //   authConfig.logIn({
-  //     email: state.user.email,
-  //     password: state.user.p
-  //   })
-
-  // }, [state, authConfig])
-
-  // useEffect(() => {
-  //   console.log('authConfig', authConfig)
-  // }, [authConfig])
 
   const setValue = useCallback((data: DataState) => {
     if (!data) throw new TypeError()

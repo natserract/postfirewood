@@ -6,41 +6,56 @@ import {
 import { of } from 'rxjs'
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject'
 import { setItem$, setItem } from 'src/utils/storage'
+import { toast } from '@redwoodjs/web/toast'
+import { AuthContextInterface } from '@redwoodjs/auth'
 
 export const createUser = async (
   username: string,
   password: string,
-  cached?: BehaviorSubject<unknown>,
+  cached: BehaviorSubject<unknown>,
+  authConfig: AuthContextInterface,
   asObservable = true
 ) => {
   const auth = getAuth()
 
   try {
-    const response = await createUserWithEmailAndPassword(
+    const responseToken = await createUserWithEmailAndPassword(
       auth,
       username,
       password
     )
 
-    if (response) {
-      const token = await response.user.getIdToken()
+    const responseSignIn = await authConfig.logIn({
+      email: username,
+      password,
+    })
 
-      // After submit, user login directly,
-      // So we need to set token in localstorage
-      if (asObservable && cached) {
-        setItem$('token', token, cached, true).subscribe((data) => of(data))
+    // Mechanism same with login in Authorization.ts
+    if (responseSignIn) {
+      // After sync with auth providers, set token
+      // Process: Promise.all([responseToken, responseSignUp])
+      if (responseToken) {
+        const token = await responseToken.user.getIdToken()
+
+        // After submit, user login directly,
+        // So we need to set token in localstorage
+        if (asObservable && cached) {
+          setItem$('token', token, cached, true).subscribe((data) => of(data))
+        }
+
+        if (!asObservable) {
+          setItem('token', token, true)
+        }
+
+        // After success create new user, send email verification
+        sendVerification()
+
+        return responseToken
       }
-
-      if (!asObservable) {
-        setItem('token', token, true)
-      }
-
-      // After success create new user, send email verification
-      sendVerification()
-
-      return response
     }
   } catch (error) {
+    toast.error(`Error createUser: ${error.what}, Code: ${error.code}`)
+
     return Promise.reject({
       code: error.code,
       what: error.message,

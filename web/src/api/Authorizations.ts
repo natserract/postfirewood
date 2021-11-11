@@ -10,13 +10,12 @@ import { AuthContextInterface } from '@redwoodjs/auth'
 export const loginUser = async (
   username: string,
   password: string,
-  cached?: BehaviorSubject<unknown>,
-  authConfig?: AuthContextInterface,
+  cached: BehaviorSubject<unknown>,
+  authConfig: AuthContextInterface,
   asObservable = true,
   _rememberMe?: boolean
 ) => {
   const auth = getAuth()
-  // const authConfig = useAuth()
 
   try {
     const responseToken = await signInWithEmailAndPassword(

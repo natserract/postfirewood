@@ -1,45 +1,48 @@
-import { getAuth } from 'firebase/auth'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useData } from './store/configureStore'
-import { Route, Switch } from 'react-router-dom'
+import { Switch } from 'react-router-dom'
 import { AnonymousRoute, PrivateRoute } from 'src/routes/'
 
 import App from 'src/layouts/ContainerLayout/ContainerLayout'
 
 import Welcome from 'src/Welcome'
-import LoginPage from 'src/pages/LoginPage/LoginPage'
 import DashboardPage from 'src/pages/DashboardPage/DashboardPage'
+import LoginPage from 'src/pages/LoginPage/LoginPage'
+import RegisterPage from 'src/pages/RegisterPage/RegisterPage'
 
 type RoutesProps = {
   isAuthenticated?: boolean
 }
 
 const Routes: React.FC<RoutesProps> = () => {
-  const [userData, setUserData] = useData()
-
-  useEffect(() => {
-    console.log('isAuthenticated', userData.auth.authenticated)
-  }, [userData])
+  const [{ auth }, _] = useData()
+  const isAuthenticated = auth.authenticated
 
   return (
     <App>
       <Switch>
         <AnonymousRoute
           component={Welcome}
-          isAuthenticated={userData.auth.authenticated}
+          isAuthenticated={isAuthenticated}
           path="/"
           exact
         />
 
         <AnonymousRoute
           component={LoginPage}
-          isAuthenticated={userData.auth.authenticated}
+          isAuthenticated={isAuthenticated}
           path="/sign-in"
+        />
+
+        <AnonymousRoute
+          component={RegisterPage}
+          isAuthenticated={isAuthenticated}
+          path="/sign-up"
         />
 
         <PrivateRoute
           component={DashboardPage}
-          isAuthenticated={userData.auth.authenticated}
+          isAuthenticated={isAuthenticated}
           path="/dashboard"
         />
       </Switch>

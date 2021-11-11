@@ -10,21 +10,20 @@ import { setItem$ } from 'src/utils/storage'
 
 const DashboardPage = () => {
   const [data] = useData()
-  const [cached] = useCached()
 
-  const handleSignUp = async () => {
-    const data = {
-      email: 'benjaminstwo@gmail.com',
-      password: 'Alfin9090',
-    }
+  // const handleSignUp = async () => {
+  //   const data = {
+  //     email: 'benjaminstwo@gmail.com',
+  //     password: 'Alfin9090',
+  //   }
 
-    try {
-      const responseData = await createUser(data.email, data.password, cached)
-      console.log('responseData createUser', responseData)
-    } catch (error) {
-      //
-    }
-  }
+  //   try {
+  //     const responseData = await createUser(data.email, data.password, cached)
+  //     console.log('responseData createUser', responseData)
+  //   } catch (error) {
+  //     //
+  //   }
+  // }
 
   return (
     <>
@@ -53,11 +52,12 @@ You can look at this documentation for best practices : https://developers.googl
           return <div>{JSON.stringify(data)}</div>
         }}
       </Query> */}
-      <Query query={UsersQuery}>
+      {/* <Query query={UsersQuery}>
         {({ data }) => {
           return <div>{JSON.stringify(data)}</div>
         }}
-      </Query>
+      </Query> */}
+      {JSON.stringify(data)}
     </>
   )
 }

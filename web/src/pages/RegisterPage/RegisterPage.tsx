@@ -1,4 +1,6 @@
-// Form docs @see https://redwoodjs.com/docs/forms
+import { MetaTags } from '@redwoodjs/web'
+import { useState } from 'react'
+import Modal from 'src/components/Modal/Modal'
 import {
   Form,
   Label,
@@ -8,16 +10,13 @@ import {
   useForm,
 } from '@redwoodjs/forms'
 import { Button } from '@material-ui/core'
-import { useCached } from 'src/store/configureStore'
-import { MetaTags } from '@redwoodjs/web'
-import { browserHistory } from 'src/utils/history'
-import { useEffect, useState } from 'react'
-import Modal from 'src/components/Modal/Modal'
-import { loginUser } from 'src/api/Authorizations'
 import { Link } from 'react-router-dom'
+import { createUser } from 'src/api/ManageUser'
+import { useCached } from 'src/store/configureStore'
 import { useAuth } from '@redwoodjs/auth'
+import { browserHistory } from 'src/utils/history'
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const authConfig = useAuth()
   const [cached] = useCached()
   const formMethods = useForm()
@@ -26,7 +25,7 @@ const LoginPage = () => {
 
   const handleSubmit = (data) => {
     if (data) {
-      handleSignIn(data)
+      handleSignUp(data)
         .then(() => {
           browserHistory.push('/dashboard')
         })
@@ -36,9 +35,11 @@ const LoginPage = () => {
     }
   }
 
-  const handleSignIn = async (data) => {
+  // TODO: ADD VERIFICATION MESSAGE
+
+  const handleSignUp = async (data) => {
     try {
-      const response = await loginUser(
+      const response = await createUser(
         data.email,
         data.password,
         cached,
@@ -53,22 +54,17 @@ const LoginPage = () => {
     }
   }
 
-  useEffect(() => {
-    return () => {
-      setOpenDialog(false)
-      formMethods.reset()
-    }
-  }, [formMethods])
-
   return (
     <>
       <MetaTags
-        title="Sign In"
-        description="Please sign in for best experience"
+        title="Register"
+        description="Please sign up if you not have an account"
+        /* you should un-comment description and add a unique description, 155 characters or less
+      You can look at this documentation for best practices : https://developers.google.com/search/docs/advanced/appearance/good-titles-snippets */
       />
 
       <Modal
-        title="Sign In"
+        title="Sign Up"
         openDialog={openDialog}
         setOpenDialog={setOpenDialog}
         closeReason="disabled"
@@ -121,12 +117,12 @@ const LoginPage = () => {
             variant="contained"
             style={{ textTransform: 'capitalize' }}
           >
-            Sign In
+            Sign Up
           </Button>
 
           <div style={{ marginTop: 25, fontSize: 13 }}>
-            Don’t have an account?
-            <Link to="/sign-up"> Sign up</Link>
+            Have an account?
+            <Link to="/sign-in"> Sign in</Link>
           </div>
         </Form>
       </Modal>
@@ -134,4 +130,4 @@ const LoginPage = () => {
   )
 }
 
-export default LoginPage
+export default RegisterPage

@@ -1,8 +1,11 @@
 import { useQuery } from '@redwoodjs/web'
 import React from 'react'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DocumentNode = any
+
 type QueryProps = {
-  query: any
+  query: DocumentNode
   id?: string
   where?: string
   children: (data) => React.ReactElement
