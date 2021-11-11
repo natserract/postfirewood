@@ -7,7 +7,7 @@ import {
   PasswordField,
   useForm,
 } from '@redwoodjs/forms'
-import { Button } from '@material-ui/core'
+import Button from '@material-ui/core/Button'
 import { useCached } from 'src/store/configureStore'
 import { MetaTags } from '@redwoodjs/web'
 import { browserHistory } from 'src/utils/history'

@@ -1,63 +1,125 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { MetaTags } from '@redwoodjs/web'
-import { useCached, useData } from 'src/store/configureStore'
-import { loginUser, logout } from 'src/api/Authorizations'
-import Query from 'src/components/Query/Query'
-// import { UsersQuery } from 'types/graphql'
-import UsersQuery from './DashboardPage.graphql'
-import { createUser } from 'src/api/ManageUser'
-import { setItem$ } from 'src/utils/storage'
+import { useData } from 'src/store/configureStore'
+import Navigation from 'src/components/Navigation/Navigation'
+import Modal from 'src/components/Modal/Modal'
+import {
+  Form,
+  Label,
+  TextField,
+  FieldError,
+  TextAreaField,
+  useForm,
+} from '@redwoodjs/forms'
+import Button from '@material-ui/core/Button'
+import { Container } from '@material-ui/core'
+import { useMutation } from '@redwoodjs/web'
+import { CREATEPOST_MUTATION } from './DashboardPage.graphql'
+import { toast } from '@redwoodjs/web/toast'
+import { stringToSlug } from 'src/utils/slug'
 
 const DashboardPage = () => {
-  const [data] = useData()
+  const [{ user }] = useData()
+  const [createPostFunc] = useMutation(CREATEPOST_MUTATION)
 
-  // const handleSignUp = async () => {
-  //   const data = {
-  //     email: 'benjaminstwo@gmail.com',
-  //     password: 'Alfin9090',
-  //   }
+  const formMethods = useForm()
 
-  //   try {
-  //     const responseData = await createUser(data.email, data.password, cached)
-  //     console.log('responseData createUser', responseData)
-  //   } catch (error) {
-  //     //
-  //   }
-  // }
+  const [openActivityDialog, setOpenActivityDialog] = useState(false)
+
+  const handleSubmit = (data) => {
+    if (data) {
+      handleCreatePost(data)
+        .then(() => {
+          console.log('Success')
+        })
+        .catch((error) => {
+          console.error('error', error.code)
+        })
+    }
+  }
+
+  const handleCreatePost = async ({ title, content }) => {
+    try {
+      const { data } = await createPostFunc({
+        variables: {
+          input: {
+            title,
+            slug: stringToSlug(title),
+            body: content,
+            userId: user.id,
+          },
+        },
+      })
+
+      console.log('createUser check', data)
+    } catch (error) {
+      console.error(error)
+      toast.error(`Error handleCreatePost: ${error.what}, Code: ${error.code}`)
+    }
+  }
+
+  const renderForm = () => (
+    <Form formMethods={formMethods} onSubmit={handleSubmit}>
+      <div className="form-group">
+        <Label name="title" className="label" errorClassName="label error" />
+        <TextField
+          name="title"
+          className="input"
+          errorClassName="input error"
+          placeholder="Input your post title"
+          validation={{
+            required: true,
+          }}
+        />
+        <FieldError name="title" className="error-message" />
+      </div>
+
+      <div className="form-group">
+        <Label name="content" className="label" errorClassName="label error" />
+        <TextAreaField
+          name="content"
+          className="input"
+          errorClassName="input error"
+          placeholder="Input your post content"
+          validation={{
+            required: true,
+          }}
+        />
+        <FieldError name="content" className="error-message" />
+      </div>
+
+      <Button
+        type="submit"
+        color="primary"
+        variant="contained"
+        style={{ textTransform: 'capitalize' }}
+      >
+        Submit
+      </Button>
+    </Form>
+  )
 
   return (
     <>
       <MetaTags
-        title="Home"
-        // description="Home description"
-        /* you should un-comment description and add a unique description, 155 characters or less
-You can look at this documentation for best practices : https://developers.google.com/search/docs/advanced/appearance/good-titles-snippets */
+        title="Dashboard"
+        description="Hey! You're in dashboard page. See your posts here!"
       />
-      <h1>HomePage</h1>
-      {/* <p>{JSON.stringify(userMetadata.accessToken)}</p> */}
-      {/* <button
-        className="link-button"
-        onClick={data.auth.authenticated ? handleSignOut : handleSignIn}
-      >
-        {data.auth.authenticated ? 'Log Out' : 'Log In'}
-      </button>
 
-      {JSON.stringify(data)}
+      <Navigation title="Dashboard" onClick={() => setOpenActivityDialog(true)}>
+        <Modal
+          title="Create New Post"
+          openDialog={openActivityDialog}
+          setOpenDialog={setOpenActivityDialog}
+          closeReason="backdropClick"
+        >
+          {renderForm()}
+        </Modal>
+      </Navigation>
 
-      <br />
-      <button onClick={handleSignUp}>SignUp</button>
-
-      <Query query={UsersQuery}>
-        {({ data }) => {
-          return <div>{JSON.stringify(data)}</div>
-        }}
-      </Query> */}
-      {/* <Query query={UsersQuery}>
-        {({ data }) => {
-          return <div>{JSON.stringify(data)}</div>
-        }}
-      </Query> */}
-      {JSON.stringify(data)}
+      <Container disableGutters={true}>
+        <p>Content</p>
+      </Container>
     </>
   )
 }

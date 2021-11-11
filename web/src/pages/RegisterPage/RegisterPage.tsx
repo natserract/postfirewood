@@ -35,8 +35,6 @@ const RegisterPage = () => {
     }
   }
 
-  // TODO: ADD VERIFICATION MESSAGE
-
   const handleSignUp = async (data) => {
     try {
       const response = await createUser(
@@ -59,8 +57,6 @@ const RegisterPage = () => {
       <MetaTags
         title="Register"
         description="Please sign up if you not have an account"
-        /* you should un-comment description and add a unique description, 155 characters or less
-      You can look at this documentation for best practices : https://developers.google.com/search/docs/advanced/appearance/good-titles-snippets */
       />
 
       <Modal

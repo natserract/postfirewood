@@ -9,6 +9,9 @@ const styles = (_theme: Theme) =>
       paddingTop: 30,
       paddingBottom: 30,
     },
+    alert: {
+      marginBottom: 30,
+    },
   })
 
 export default styles

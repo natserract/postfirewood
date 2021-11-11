@@ -1,4 +1,4 @@
-const QUERY = gql`
+export const USERS_QUERY = gql`
   query UsersQuery {
     users {
       id
@@ -9,4 +9,12 @@ const QUERY = gql`
   }
 `
 
-export default QUERY
+export const CREATEPOST_MUTATION = gql`
+  mutation CreatePostMutation($input: CreatePostInput!) {
+    createPost(input: $input) {
+      id
+      title
+      body
+    }
+  }
+`
