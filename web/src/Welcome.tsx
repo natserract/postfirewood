@@ -9,19 +9,21 @@ const Welcome = () => {
       <Typography component="h1" variant="h3">
         Welcome!
       </Typography>
+      <br />
+
+      <Typography component="p" variant="h4">
+        Lorem ipsum is placeholder text commonly used in the graphic, print, and
+        publishing industries for previewing layouts and visual mockups.
+      </Typography>
+
+      <br />
       <Button
-        variant="contained"
-        color="primary"
+        variant="outlined"
+        color="inherit"
         onClick={() => browserHistory.push('/sign-in')}
+        size="large"
       >
-        Sign In
-      </Button>
-      <Button
-        variant="contained"
-        color="secondary"
-        onClick={() => browserHistory.push('/sign-up')}
-      >
-        Sign Up
+        More Explore
       </Button>
     </Container>
   )

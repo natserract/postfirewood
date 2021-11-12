@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { MetaTags } from '@redwoodjs/web'
 import { useData } from 'src/store/configureStore'
 import Navigation from 'src/components/Navigation/Navigation'
@@ -26,10 +26,12 @@ import Card from 'src/components/Card/Card'
 import { parseDate } from 'src/utils/date'
 import { extractError } from 'src/utils/errors'
 import { browserHistory } from 'src/utils/history'
+import { useLocation } from 'react-router-dom'
 
 const DashboardPage = () => {
   const [{ user, auth }] = useData()
   const formMethods = useForm()
+  const location = useLocation()
 
   const {
     data: postsData,
@@ -173,6 +175,24 @@ const DashboardPage = () => {
       ))
     )
   }, [postsData, errorPostsData, handleDeletePost, handleClickCard])
+
+  // After update post, and go back history
+  // Need to refetch post
+  useEffect(() => {
+    const { from } = location.state as any
+
+    const onRefetch = async () => {
+      if (String(from).includes('post')) {
+        const refetch = await refetchPostsData()
+        console.log('refetch', refetch)
+        return refetch
+      }
+    }
+
+    onRefetch()
+  }, [location, refetchPostsData])
+
+  console.log('rendered times')
 
   return (
     <>

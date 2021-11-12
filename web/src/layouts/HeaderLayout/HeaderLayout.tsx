@@ -6,12 +6,14 @@ import { useData } from 'src/store/configureStore'
 import Button from '@material-ui/core/Button'
 import { logout } from 'src/api/Authorizations'
 import { browserHistory } from 'src/utils/history'
+import { useLocation } from 'react-router-dom'
 
 const useStyles = makeStyles(styles)
 
 const HeaderLayout: React.FC = () => {
   const classes = useStyles()
   const [{ auth, user }] = useData()
+  const location = useLocation()
 
   const handleSignOut = async () => {
     try {
@@ -26,7 +28,11 @@ const HeaderLayout: React.FC = () => {
       <Toolbar>
         <Container maxWidth="md">
           <button
-            onClick={() => browserHistory.push('/dashboard')}
+            onClick={() =>
+              browserHistory.push('/dashboard', {
+                from: location.pathname,
+              })
+            }
             className={classes.title}
           >
             <Typography variant="h3" component="h1">
