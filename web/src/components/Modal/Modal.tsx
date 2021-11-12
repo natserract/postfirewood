@@ -15,6 +15,7 @@ type Props = {
   setOpenDialog: Function
   children: React.ReactNode
   closeReason?: 'backdropClick' | 'escapeKeyDown' | 'disabled'
+  onClose?: Function
 
   [k: string]: any
 }
@@ -27,6 +28,7 @@ const Modal: React.FC<Props> = (props) => {
     openDialog,
     setOpenDialog,
     closeReason,
+    onClose,
     children,
     ...restProps
   } = props
@@ -40,6 +42,12 @@ const Modal: React.FC<Props> = (props) => {
     if (reason !== 'disabled') {
       setOpenDialog(false)
     }
+    onClose()
+  }
+
+  const handleCloseActionButton = () => {
+    setOpenDialog(false)
+    onClose()
   }
 
   return (
@@ -59,7 +67,7 @@ const Modal: React.FC<Props> = (props) => {
             <IconButton
               aria-label="close"
               className={classes.closeButton}
-              onClick={() => setOpenDialog(false)}
+              onClick={() => handleCloseActionButton()}
             >
               <CloseIcon />
             </IconButton>

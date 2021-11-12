@@ -11,10 +11,13 @@ const styles = (theme: Theme) =>
     title: {
       flexGrow: 1,
       textDecoration: 'none',
-      paddingTop: 15,
       color: '#fff',
+      padding: 0,
+      background: 'transparent',
+      border: 0,
+      cursor: 'pointer',
 
-      '& h3': {
+      '& h1': {
         fontSize: 24,
       },
     },

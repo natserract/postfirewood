@@ -8,6 +8,7 @@ import App from 'src/layouts/ContainerLayout/ContainerLayout'
 import Welcome from 'src/Welcome'
 import DashboardPage from 'src/pages/DashboardPage/DashboardPage'
 import LoginPage from 'src/pages/LoginPage/LoginPage'
+import PostPage from 'src/pages/PostPage/PostPage'
 import RegisterPage from 'src/pages/RegisterPage/RegisterPage'
 import NotFoundPage from 'src/pages/NotFoundPage/NotFoundPage'
 
@@ -39,6 +40,12 @@ const Routes: React.FC<RoutesProps> = () => {
           component={RegisterPage}
           isAuthenticated={isAuthenticated}
           path="/sign-up"
+        />
+
+        <PrivateRoute
+          component={PostPage}
+          isAuthenticated={isAuthenticated}
+          path="/post/:id"
         />
 
         <PrivateRoute

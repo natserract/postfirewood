@@ -18,7 +18,6 @@ import {
   CREATEPOST_MUTATION,
   DELETEPOST_MUTATION,
   POSTS_QUERY,
-  POST_QUERY,
 } from './DashboardPage.graphql'
 import { toast } from '@redwoodjs/web/toast'
 import { stringToSlug } from 'src/utils/slug'
@@ -26,6 +25,7 @@ import Grid from '@material-ui/core/Grid'
 import Card from 'src/components/Card/Card'
 import { parseDate } from 'src/utils/date'
 import { extractError } from 'src/utils/errors'
+import { browserHistory } from 'src/utils/history'
 
 const DashboardPage = () => {
   const [{ user, auth }] = useData()
@@ -37,26 +37,18 @@ const DashboardPage = () => {
     refetch: refetchPostsData,
   } = useQuery(POSTS_QUERY)
 
-  const [selectedId, setSelectedId] = useState(null)
-
-  const { data: postData } = useQuery(POST_QUERY, {
-    variables: {
-      id: selectedId,
-    },
-  })
-
   const [createPostFunc] = useMutation(CREATEPOST_MUTATION)
   const [deletePostFunc] = useMutation(DELETEPOST_MUTATION)
 
-  const [openNewPostDialog, setOpenNewPostDialog] = useState(false)
-  const [openEditPostDialog, setOpenEditPostDialog] = useState(false)
+  const [openDialog, setOpenDialog] = useState(false)
 
   const handleSubmit = (data) => {
     if (data) {
       handleCreatePost(data)
         .then(() => {
           refetchPostsData()
-          setOpenNewPostDialog(false)
+          setOpenDialog(false)
+          resetForm()
         })
         .catch((error) => {
           console.error('error', error.code)
@@ -87,6 +79,7 @@ const DashboardPage = () => {
       toast.error(`Error handleCreatePost: ${error.what}, Code: ${error.code}`)
     }
   }
+
   const handleDeletePost = useCallback(
     async (id: string) => {
       try {
@@ -108,6 +101,14 @@ const DashboardPage = () => {
     [deletePostFunc, refetchPostsData]
   )
 
+  const handleClickCard = useCallback((id: string) => {
+    browserHistory.push(`/post/${id}`)
+  }, [])
+
+  const resetForm = () => {
+    formMethods.reset()
+  }
+
   const renderForm = () => (
     <Form formMethods={formMethods} onSubmit={handleSubmit}>
       <div className="form-group">
@@ -117,7 +118,6 @@ const DashboardPage = () => {
           className="input"
           errorClassName="input error"
           placeholder="Input your post title"
-          value={postData?.post.title ?? ''}
           validation={{
             required: true,
           }}
@@ -132,7 +132,6 @@ const DashboardPage = () => {
           className="input"
           errorClassName="input error"
           placeholder="Input your post content"
-          value={postData?.post.body ?? ''}
           validation={{
             required: true,
           }}
@@ -151,12 +150,7 @@ const DashboardPage = () => {
     </Form>
   )
 
-  const handleClickCard = useCallback((id: string) => {
-    setSelectedId(id)
-    setOpenEditPostDialog(true)
-  }, [])
-
-  const renderActivityItems = useCallback(() => {
+  const renderPostItems = useCallback(() => {
     if (!postsData && !postsData?.posts) {
       return <Grid item>Fetching data...</Grid>
     }
@@ -187,12 +181,13 @@ const DashboardPage = () => {
         description="Hey! You're in dashboard page. See your posts here!"
       />
 
-      <Navigation title="Dashboard" onClick={() => setOpenNewPostDialog(true)}>
+      <Navigation title="Dashboard" onClick={() => setOpenDialog(true)}>
         <Modal
           title="Create New Post"
-          openDialog={openNewPostDialog}
-          setOpenDialog={setOpenNewPostDialog}
+          openDialog={openDialog}
+          setOpenDialog={setOpenDialog}
           closeReason="backdropClick"
+          onClose={resetForm}
         >
           {renderForm()}
         </Modal>
@@ -203,16 +198,7 @@ const DashboardPage = () => {
           'Loading...'
         ) : (
           <Grid container spacing={3} alignItems="stretch">
-            {renderActivityItems()}
-
-            <Modal
-              title="Edit Post"
-              openDialog={openEditPostDialog}
-              setOpenDialog={setOpenEditPostDialog}
-              closeReason="backdropClick"
-            >
-              {renderForm()}
-            </Modal>
+            {renderPostItems()}
           </Grid>
         )}
       </Container>
