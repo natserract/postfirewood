@@ -36,7 +36,7 @@ const Navigation: React.FC<Props> = (props) => {
             className={classes.btnAdd}
             onClick={props.onClick}
           >
-            Add
+            Create
           </Button>
         </aside>
       </div>

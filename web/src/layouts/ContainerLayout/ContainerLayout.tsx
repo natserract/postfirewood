@@ -13,6 +13,28 @@ const ContainerLayout: React.FC = (props) => {
   const classes = useStyles()
   const [{ auth, user }] = useData()
 
+  const renderAlert = () => {
+    if (auth.authenticated && !user.emailVerified) {
+      return (
+        <div className={classes.alert}>
+          <Alert severity="warning" variant="outlined">
+            <AlertTitle>Confirm your email address!</AlertTitle>
+            <p>
+              Thanks for joining Redwood!. To finish signing up, please confirm
+              your email address.
+            </p>
+
+            <p>
+              This ensures we have right email in case we need to contact you.
+            </p>
+          </Alert>
+        </div>
+      )
+    }
+
+    return <React.Fragment />
+  }
+
   return (
     <React.Fragment>
       <Toaster
@@ -22,21 +44,8 @@ const ContainerLayout: React.FC = (props) => {
 
       <HeaderLayout />
       <Container maxWidth="md" className={classes.layout}>
-        {auth.authenticated && !user.emailVerified && (
-          <div className={classes.alert}>
-            <Alert severity="warning" variant="outlined">
-              <AlertTitle>Confirm your email address!</AlertTitle>
-              <p>
-                Thanks for joining Redwood!. To finish signing up, please
-                confirm your email address.
-              </p>
+        {renderAlert()}
 
-              <p>
-                This ensures we have right email in case we need to contact you.
-              </p>
-            </Alert>
-          </div>
-        )}
         {props.children}
       </Container>
     </React.Fragment>

@@ -20,12 +20,29 @@ export const POSTS_QUERY = gql`
   }
 `
 
+export const POST_QUERY = gql`
+  query PostQuery($id: String!) {
+    post(id: $id) {
+      title
+      body
+    }
+  }
+`
+
 export const CREATEPOST_MUTATION = gql`
   mutation CreatePostMutation($input: CreatePostInput!) {
     createPost(input: $input) {
       id
       title
       body
+    }
+  }
+`
+
+export const DELETEPOST_MUTATION = gql`
+  mutation DeletePostMutation($id: String!) {
+    deletePost(id: $id) {
+      id
     }
   }
 `

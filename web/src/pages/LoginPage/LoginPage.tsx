@@ -120,6 +120,7 @@ const LoginPage = () => {
             type="submit"
             color="primary"
             variant="contained"
+            disabled={loadingDialog}
             style={{ textTransform: 'capitalize' }}
           >
             {loadingDialog ? 'Loading...' : 'Sign In'}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { MetaTags } from '@redwoodjs/web'
 import { useData } from 'src/store/configureStore'
 import Navigation from 'src/components/Navigation/Navigation'
@@ -14,25 +14,49 @@ import {
 import Button from '@material-ui/core/Button'
 import { Container } from '@material-ui/core'
 import { useMutation, useQuery } from '@redwoodjs/web'
-import { CREATEPOST_MUTATION, POSTS_QUERY } from './DashboardPage.graphql'
+import {
+  CREATEPOST_MUTATION,
+  DELETEPOST_MUTATION,
+  POSTS_QUERY,
+  POST_QUERY,
+} from './DashboardPage.graphql'
 import { toast } from '@redwoodjs/web/toast'
 import { stringToSlug } from 'src/utils/slug'
+import Grid from '@material-ui/core/Grid'
+import Card from 'src/components/Card/Card'
+import { parseDate } from 'src/utils/date'
+import { extractError } from 'src/utils/errors'
 
 const DashboardPage = () => {
   const [{ user, auth }] = useData()
   const formMethods = useForm()
 
-  const { data: postsData, refetch: refetchPostsData } = useQuery(POSTS_QUERY)
-  const [createPostFunc] = useMutation(CREATEPOST_MUTATION)
+  const {
+    data: postsData,
+    error: errorPostsData,
+    refetch: refetchPostsData,
+  } = useQuery(POSTS_QUERY)
 
-  const [openActivityDialog, setOpenActivityDialog] = useState(false)
+  const [selectedId, setSelectedId] = useState(null)
+
+  const { data: postData } = useQuery(POST_QUERY, {
+    variables: {
+      id: selectedId,
+    },
+  })
+
+  const [createPostFunc] = useMutation(CREATEPOST_MUTATION)
+  const [deletePostFunc] = useMutation(DELETEPOST_MUTATION)
+
+  const [openNewPostDialog, setOpenNewPostDialog] = useState(false)
+  const [openEditPostDialog, setOpenEditPostDialog] = useState(false)
 
   const handleSubmit = (data) => {
     if (data) {
       handleCreatePost(data)
         .then(() => {
           refetchPostsData()
-          setOpenActivityDialog(false)
+          setOpenNewPostDialog(false)
         })
         .catch((error) => {
           console.error('error', error.code)
@@ -63,6 +87,26 @@ const DashboardPage = () => {
       toast.error(`Error handleCreatePost: ${error.what}, Code: ${error.code}`)
     }
   }
+  const handleDeletePost = useCallback(
+    async (id: string) => {
+      try {
+        const responseDeletePost = await deletePostFunc({
+          variables: {
+            id,
+          },
+        })
+
+        refetchPostsData()
+        return responseDeletePost
+      } catch (error) {
+        console.error(error)
+        toast.error(
+          `Error handleDeletePost: ${error.what}, Code: ${error.code}`
+        )
+      }
+    },
+    [deletePostFunc, refetchPostsData]
+  )
 
   const renderForm = () => (
     <Form formMethods={formMethods} onSubmit={handleSubmit}>
@@ -73,6 +117,7 @@ const DashboardPage = () => {
           className="input"
           errorClassName="input error"
           placeholder="Input your post title"
+          value={postData?.post.title ?? ''}
           validation={{
             required: true,
           }}
@@ -87,6 +132,7 @@ const DashboardPage = () => {
           className="input"
           errorClassName="input error"
           placeholder="Input your post content"
+          value={postData?.post.body ?? ''}
           validation={{
             required: true,
           }}
@@ -105,6 +151,35 @@ const DashboardPage = () => {
     </Form>
   )
 
+  const handleClickCard = useCallback((id: string) => {
+    setSelectedId(id)
+    setOpenEditPostDialog(true)
+  }, [])
+
+  const renderActivityItems = useCallback(() => {
+    if (!postsData && !postsData?.posts) {
+      return <Grid item>Fetching data...</Grid>
+    }
+
+    if (errorPostsData) {
+      return <Grid item>{extractError(errorPostsData).message}</Grid>
+    }
+
+    return (
+      postsData &&
+      postsData.posts.map((item, index) => (
+        <Grid item xs={12} sm={3} key={`item-${item.id}-${index}`}>
+          <Card
+            title={item?.title}
+            date={parseDate(item?.createdAt)}
+            onClick={() => handleClickCard(item.id)}
+            onDelete={() => handleDeletePost(item.id)}
+          />
+        </Grid>
+      ))
+    )
+  }, [postsData, errorPostsData, handleDeletePost, handleClickCard])
+
   return (
     <>
       <MetaTags
@@ -112,11 +187,11 @@ const DashboardPage = () => {
         description="Hey! You're in dashboard page. See your posts here!"
       />
 
-      <Navigation title="Dashboard" onClick={() => setOpenActivityDialog(true)}>
+      <Navigation title="Dashboard" onClick={() => setOpenNewPostDialog(true)}>
         <Modal
           title="Create New Post"
-          openDialog={openActivityDialog}
-          setOpenDialog={setOpenActivityDialog}
+          openDialog={openNewPostDialog}
+          setOpenDialog={setOpenNewPostDialog}
           closeReason="backdropClick"
         >
           {renderForm()}
@@ -127,7 +202,18 @@ const DashboardPage = () => {
         {auth.loading ? (
           'Loading...'
         ) : (
-          <div>JSON {JSON.stringify(postsData)}</div>
+          <Grid container spacing={3} alignItems="stretch">
+            {renderActivityItems()}
+
+            <Modal
+              title="Edit Post"
+              openDialog={openEditPostDialog}
+              setOpenDialog={setOpenEditPostDialog}
+              closeReason="backdropClick"
+            >
+              {renderForm()}
+            </Modal>
+          </Grid>
         )}
       </Container>
     </>
