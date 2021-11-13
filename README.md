@@ -20,6 +20,10 @@ and feature upgrades over time and with minimum effort.
 - [Docs](https://redwoodjs.com/docs/introduction): using the Redwood Router, handling assets and files, list of command-line tools, and more.
 - [Redwood Community](https://community.redwoodjs.com): get help, share tips and tricks, and collaborate on everything about RedwoodJS.
 
+## Required Knowledge
+This project comfortable with the various tools uses such as ([GraphQL](https://graphql.org/learn/), [TypeScript](https://www.typescriptlang.org/docs/), [React](https://reactjs.org/docs/getting-started.html), [Prisma](https://www.prisma.io/), [Jest](https://jestjs.io/), [PostgreSQL](https://www.postgresql.org/docs/current/index.html), [Storybook](https://storybook.js.org/), etc)
+
+
 ### Setup
 
 We use Yarn as our package manager. To get the dependencies installed, just do this in the root directory:
@@ -43,7 +47,7 @@ yarn rw storybook
 Your browser should open automatically to `http://localhost:8910` to see the web app. Lambda functions run on `http://localhost:8911` and are also proxied to `http://localhost:8910/.redwood/functions/*`.
 
 ## Addition Features
-The goal is to have the following:
+Some of the implementations added:
 - Authentication and Sign Up using firebase
 - Token encryption for authentication
 - Observable token
