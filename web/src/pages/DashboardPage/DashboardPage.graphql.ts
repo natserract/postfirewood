@@ -1,3 +1,13 @@
+export const USER_QUERY = gql`
+  query UserQuery($id: String!) {
+    user(id: $id) {
+      id
+      name
+      email
+      emailVerified
+    }
+  }
+`
 export const USERS_QUERY = gql`
   query UsersQuery {
     users {

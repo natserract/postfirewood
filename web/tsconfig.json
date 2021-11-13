@@ -24,6 +24,7 @@
     "jsx": "preserve",
   },
   "include": [
+    "types.d.ts",
     "src",
     "../.redwood/types/includes/all-*",
     "../.redwood/types/includes/web-*",

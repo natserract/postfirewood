@@ -1,6 +1,6 @@
 import ContainerLayout from './ContainerLayout'
 
-export const generated = () => {
+export const Default = () => {
   return <ContainerLayout />
 }
 
