@@ -21,8 +21,15 @@ and feature upgrades over time and with minimum effort.
 - [Redwood Community](https://community.redwoodjs.com): get help, share tips and tricks, and collaborate on everything about RedwoodJS.
 
 ## Required Knowledge
-This project comfortable with the various tools uses such as ([GraphQL](https://graphql.org/learn/), [TypeScript](https://www.typescriptlang.org/docs/), [React](https://reactjs.org/docs/getting-started.html), [Prisma](https://www.prisma.io/), [Jest](https://jestjs.io/), [PostgreSQL](https://www.postgresql.org/docs/current/index.html), [Storybook](https://storybook.js.org/), etc)
-
+This project comfortable with the various tools uses such as
+- [GraphQL](https://graphql.org/learn/)
+- [TypeScript](https://www.typescriptlang.org/docs/)
+- [React](https://reactjs.org/docs/getting-started.html)
+- [Prisma](https://www.prisma.io/)
+- [Jest](https://jestjs.io/)
+- [PostgreSQL](https://www.postgresql.org/docs/current/index.html)
+- [Storybook](https://storybook.js.org/)
+- [RxJs](https://rxjs.dev/), etc
 
 ### Setup
 
